@@ -1,4 +1,4 @@
-import { Server, Socket } from 'socket.io'
+import { Server } from 'socket.io'
 import type { DrawLine } from './types/typing'
 const PORT = process.env.PORT || '3001'
 
@@ -9,6 +9,11 @@ const io = new Server(parseInt(PORT), {
         ? '*:*'
         : `http://localhost:${PORT}`,
     methods: ['GET', 'POST']
+  },
+  pingInterval: 5000,
+  pingTimeout: 10000,
+  connectionStateRecovery: {
+    maxDisconnectionDuration: 30000
   }
 })
 
