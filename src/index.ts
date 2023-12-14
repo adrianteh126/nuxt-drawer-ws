@@ -1,19 +1,22 @@
-import express from 'express'
-import http from 'node:http'
-import { Server } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 import type { DrawLine } from './types/typing'
+const PORT = process.env.PORT || '3001'
 
-const app = express()
-const server = http.createServer(app)
-
-const io = new Server(server, {
+const io = new Server(parseInt(PORT), {
   cors: {
     origin:
-      process.env.NODE_ENV === 'production' ? false : 'http://localhost:3000' // TODO: modify to target origin
+      process.env.NODE_ENV === 'production'
+        ? '*:*'
+        : `http://localhost:${PORT}`,
+    methods: ['GET', 'POST']
   }
 })
 
+console.log(`✔️ Server listening on port ${PORT}`)
+
 io.on('connection', (socket) => {
+  console.log(`Someone joined. Listener: ${io.engine.clientsCount}`)
+
   socket.on('client-ready', () => {
     socket.broadcast.emit('get-canvas-state')
   })
@@ -32,9 +35,9 @@ io.on('connection', (socket) => {
       })
     }
   )
-  socket.on('clear', () => socket.broadcast.emit('clear'))
-})
 
-server.listen(3001, () => {
-  console.log('✔️ Server listening on port 3001')
+  socket.on('clear', () => socket.broadcast.emit('clear'))
+  socket.on('disconnect', () => {
+    console.log(`Someone leave. Listener: ${io.engine.clientsCount}`)
+  })
 })
