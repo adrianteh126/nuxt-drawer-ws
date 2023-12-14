@@ -12,6 +12,7 @@ const io = new Server(parseInt(PORT), {
   },
   pingInterval: 5000,
   pingTimeout: 10000,
+  connectTimeout: 30000,
   connectionStateRecovery: {
     maxDisconnectionDuration: 30000
   }
